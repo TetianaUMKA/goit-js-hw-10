@@ -1,20 +1,20 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
-import { fetchCountries } from './js/fetch-countries';
+import { fetchCountries } from './js/fetchCountries';
 
-const input = document.querySelector('#search-box');
+const inputSearchBox = document.querySelector('#search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
 const DEBOUNCE_DELAY = 300;
 
-input.addEventListener(
+inputSearchBox.addEventListener(
   'input',
   debounce(() => {
-    const trimmedValue = input.value.trim();
+    const trimmedInputValue = inputSearchBox.value.trim();
     cleanHtml();
-    if (trimmedValue !== '') {
-        fetchCountries(trimmedValue).then(foundData => {
+    if (trimmedInputValue !== '') {
+        fetchCountries(trimmedInputValue).then(foundData => {
             switch (true) {   
                 case foundData.length === 0:
                     Notiflix.Notify.failure('Oops, there is no country with that name');
@@ -33,3 +33,26 @@ input.addEventListener(
     }
   }, DEBOUNCE_DELAY)
 );
+
+function renderCountryList(countries) {
+  const markupCountryList = countries
+    .map(country => {
+      return `<li><img src="${country.flags.svg}" alt="Flag of ${country.name.official}" width="30" hight="20"><p>${country.name.official}</p></li>`;
+    }).join('');
+
+  countryList.innerHTML = markupCountryList;
+}
+
+function renderOneCountry(countries) {
+  const markupOneCountry = countries
+    .map(country => {
+      return `<li><img src="${country.flags.svg}" alt="Flag of ${country.name.official}" width="30" hight="20"><p>${country.name.official}</p><p><b>Capital</b>: ${country.capital}</p><p><b>Population</b>: ${country.population}</p><p><b>Languages</b>: ${Object.values(country.languages)} </p></li>`;
+    }).join('');
+
+  countryList.innerHTML = markupOneCountry;
+}
+
+function cleanHtml() {
+  countryList.innerHTML = '';
+  countryInfo.innerHTML = '';
+}
